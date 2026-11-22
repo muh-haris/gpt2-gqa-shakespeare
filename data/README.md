@@ -1,19 +1,27 @@
 # Tiny Shakespeare Dataset
 
-Source: Andrej Karpathy's char-rnn repository.
+This directory contains the Tiny Shakespeare dataset used to train and evaluate our GPT-2-style language model with Grouped-Query Attention (GQA).
 
-Run the preparation script from the project root:
+**Dataset source:** [Andrej Karpathy's Tiny Shakespeare](https://github.com/karpathy/char-rnn/tree/master/data/tinyshakespeare)
 
-python prepare_data.py
+The dataset contains approximately 1.1 million characters of Shakespearean dialogue and text.
 
-This creates:
+## Dataset Structure
 
-- data/raw/shakespeare.txt
-- data/processed/train.txt
-- data/processed/val.txt
+- `raw/shakespeare.txt` — Original downloaded dataset.
+- `processed/train.txt` — Training data (90%).
+- `processed/val.txt` — Validation data (10%).
 
-The corpus is divided chronologically into
-90% training text and 10% validation text.
+## Data Preparation
 
-The BPE tokenizer will be trained only on
-the training portion to avoid data leakage.
+Run the following command from the project root:
+
+`python prepare_data.py`
+
+This downloads the dataset and creates the training and validation files.
+
+## Git Tracking
+
+The dataset files are excluded from Git because they can be downloaded and regenerated.
+
+Only this `README.md` should be committed to document the dataset and its preparation process.
