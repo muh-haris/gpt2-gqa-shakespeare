@@ -1,11 +1,13 @@
 # gpt2-gqa-shakespeare
 
 GPT-2-style Transformer implementation with grouped-query attention and BPE tokenization, trained on the Shakespeare dataset.
+Explain the decoder-only Transformer architecture, configuration, how Q/K/V attention operates, the use of pre-LayerNorm and residual connections, and how the custom 512-token BPE vocabulary is connected to the embedding and output layers.
 
-# gpt3
+Include the commands for reproducing the tests and smoke test. Credit Karpathy's code-along as an educational reference, while documenting your implementation decisions.
 
-This project implements a simplified GPT-style byte-level Byte Pair Encoding (BPE) tokenizer for preparing text for a GPT-2-style language model with Grouped-Query Attention (GQA).
+# gpt4
 
-The tokenizer converts text into token IDs that can be used during language model training.
+GPT-2 Architecture
+Explain the decoder-only Transformer architecture, configuration, how Q/K/V attention operates, the use of pre-LayerNorm and residual connections, and how the custom 512-token BPE vocabulary is connected to the embedding and output layers.
 
-This implementation is a simplified GPT-style byte-level BPE tokenizer. It is not a byte-for-byte reproduction of the original OpenAI GPT-2 tokenizer.
+Include the commands for reproducing the tests and smoke test. Credit Karpathy's code-along as an educational reference, while documenting your implementation decisions.
