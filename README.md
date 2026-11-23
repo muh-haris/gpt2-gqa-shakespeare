@@ -23,3 +23,32 @@ Document that your implementation uses explicit KV repetition for compatibility.
 # gpt6
 
 Training Pipeline documenting the data requirements, training commands, parameter settings, validation strategy, checkpoint format, resumption command and CPU limitations.
+
+# reproducibility commands
+
+These commands in the README so another developer can run the project after cloning.
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+
+# Document the separate PyTorch installation command if requirements.txt does not include it. The README must make clear that PyTorch is required.
+
+Then:
+python prepare_data.py
+python train_tokenizer.py
+python -m pytest -v
+
+# To reproduce your 500-step experiment:
+
+python train.py --steps 500 --batch-size 4 --seq-len 64 --warmup-steps 25 --eval-every 50 --eval-batches 10 --log-every 10 --save-every 50 --threads 4 --seed 42
+
+# To generate text after training:
+
+python generate.py --prompt "ROMEO:" --max-new-tokens 120 --temperature 0.9 --top-k 40 --seed 42
+
+# Include a README section explaining where to place the downloaded files:
+
+checkpoints/gpt_gqa_best.pt
+data/processed/tokenizer.json
