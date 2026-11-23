@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data" / "processed"
 CHECKPOINT = ROOT / "checkpoints" / "gpt_gqa_latest.pt"
 METRICS = ROOT / "runs" / "training_log.csv"
-
+BEST_CHECKPOINT = ROOT / "checkpoints" / "gpt_gqa_best.pt"
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -82,6 +82,22 @@ def record(step, train_loss, val_loss, lr, new_run=False):
             ])
 
         writer.writerow([step, train_loss, val_loss, lr])
+
+
+def save_best_model(model, step, val_loss, config, fingerprints):
+    BEST_CHECKPOINT.parent.mkdir(parents=True, exist_ok=True)
+
+    state = {
+        "step": step,
+        "val_loss": float(val_loss),
+        "config": asdict(config),
+        "fingerprints": fingerprints,
+        "model": model.state_dict(),
+    }
+
+    temporary = BEST_CHECKPOINT.with_suffix(".tmp")
+    torch.save(state, temporary)
+    temporary.replace(BEST_CHECKPOINT)
 
 
 def run(args):
@@ -177,6 +193,7 @@ def run(args):
     sampler = torch.Generator().manual_seed(args.seed + 1)
 
     start = 0
+    best_val = float("inf")
 
     if args.resume:
         if not CHECKPOINT.exists():
@@ -188,6 +205,21 @@ def run(args):
             model, optimizer, sampler, config, fingerprints, device
         )
 
+        if BEST_CHECKPOINT.exists():
+            previous_best = torch.load(
+                BEST_CHECKPOINT,
+                map_location="cpu",
+                weights_only=True,
+            )
+
+            if (
+                previous_best["config"] != asdict(config)
+                or previous_best["fingerprints"] != fingerprints
+            ):
+                raise ValueError("Best checkpoint belongs to another run")
+
+            best_val = float(previous_best["val_loss"])
+
         if args.steps <= start:
             raise ValueError(
                 f"--steps must be greater than checkpoint step {start}"
@@ -195,6 +227,8 @@ def run(args):
 
         print(f"Resumed from step {start}")
     else:
+        BEST_CHECKPOINT.unlink(missing_ok=True)
+
         initial_val = evaluate(
             model, val_ids, args.seq_len,
             args.batch_size, args.eval_batches, device
@@ -257,6 +291,13 @@ def run(args):
             )
 
             print(f"              val loss {val_loss:.4f}")
+
+            if val_loss < best_val:
+                best_val = val_loss
+                save_best_model(
+                    model, step, val_loss, config, fingerprints
+                )
+                print(f"              new best loss {best_val:.4f}")
 
         if step % args.save_every == 0 or step == args.steps:
             save_checkpoint(

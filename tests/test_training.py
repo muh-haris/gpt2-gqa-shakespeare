@@ -117,3 +117,37 @@ def test_checkpoint_restores_weights(tmp_path, monkeypatch):
     assert torch.equal(
         model.token_embedding.weight, before
     )
+
+
+def test_best_checkpoint(tmp_path, monkeypatch):
+    path = tmp_path / "best.pt"
+    monkeypatch.setattr(train, "BEST_CHECKPOINT", path)
+
+    config = GPTConfig(
+        vocab_size=512,
+        context_length=16,
+        n_embd=32,
+        n_layers=1,
+        n_heads=4,
+        n_kv_heads=2,
+        dropout=0.0,
+    )
+
+    model = GPTLanguageModel(config)
+
+    train.save_best_model(
+        model,
+        step=20,
+        val_loss=3.5,
+        config=config,
+        fingerprints={"train.txt": "test"},
+    )
+
+    saved = torch.load(
+        path, map_location="cpu", weights_only=True
+    )
+
+    assert saved["step"] == 20
+    assert saved["val_loss"] == 3.5
+    assert saved["config"]["n_kv_heads"] == 2
+    assert "model" in saved
