@@ -19,3 +19,7 @@ Grouped-Query Attention describing the eight query heads, two KV heads, group si
 Include the original GQA research paper as the technical reference.
 
 Document that your implementation uses explicit KV repetition for compatibility. Avoid claiming that it provides native fused GQA execution or an optimized KV cache.
+
+# gpt6
+
+Training Pipeline documenting the data requirements, training commands, parameter settings, validation strategy, checkpoint format, resumption command and CPU limitations.
